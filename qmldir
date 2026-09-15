@@ -1,2 +1,3 @@
 singleton Theme 1.0 Theme.qml
 singleton Sys 1.0 Sys.qml
+singleton Intro 1.0 Intro.qml

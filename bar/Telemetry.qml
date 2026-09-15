@@ -2,31 +2,46 @@ import QtQuick
 import ".."
 import "../components"
 
-// Decorative readouts: node id, real uptime, CPU sparkline.
+// Decorative readouts: node id, real uptime, barcode + microtext strips, CPU sparkline.
 Row {
     id: root
-    spacing: Theme.gap * 2
+    spacing: Theme.gap + 4
 
-    // Stable pseudo node id derived from the hostname.
-    readonly property string nodeId: {
-        let h = 0x811c9dc5;
-        const s = Sys.hostname;
-        for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
-        const hex = h.toString(16).toUpperCase().padStart(8, "0");
-        return hex.substring(0, 2) + "-" + hex.substring(2, 6);
-    }
 
     Row {
         spacing: 6
         anchors.verticalCenter: parent.verticalCenter
         MonoText { text: "NODE"; color: Theme.dim }
-        MonoText { text: root.nodeId; color: Theme.dim }
+        MonoText { text: Sys.nodeId; color: Theme.dim }
     }
     Row {
         spacing: 6
         anchors.verticalCenter: parent.verticalCenter
         MonoText { text: "UP"; color: Theme.dim }
         MonoText { text: Sys.fmtUptime(Sys.uptime); color: Theme.dim }
+    }
+
+    // barcode strip
+    TintedIcon {
+        anchors.verticalCenter: parent.verticalCenter
+        source: Qt.resolvedUrl("../assets/barcode.svg")
+        color: Theme.dim
+        height: 12; width: 46
+    }
+
+    // microtext strip: a window onto the rotated device-text asset
+    Item {
+        anchors.verticalCenter: parent.verticalCenter
+        width: 110; height: 10
+        clip: true
+        TintedIcon {
+            source: Qt.resolvedUrl("../assets/device-text.svg")
+            color: Theme.dim
+            width: 10; height: 300
+            rotation: 90
+            transformOrigin: Item.TopLeft
+            x: 300; y: 0
+        }
     }
 
     // Sparkline: 20 cells of CPU history
@@ -43,7 +58,6 @@ Row {
                 readonly property int offset: Sys.historyLen - Sys.cpuHistory.length
                 readonly property real v: index >= offset ? Sys.cpuHistory[index - offset] : 0
                 width: spark.cellW; height: spark.height
-                // floor line so empty cells still read as a track
                 Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: 1; color: Theme.border }
                 Rectangle {
                     anchors.bottom: parent.bottom

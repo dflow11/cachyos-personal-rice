@@ -5,13 +5,13 @@ import ".."
 import "../components"
 
 // Fixed-width numbered cells for workspaces 1..count.
-// Focus box follows the workspace active on THIS bar's monitor.
+// Corner-frame bracket follows the workspace active on THIS bar's monitor.
 Item {
     id: root
     required property ShellScreen screen
     property int count: 5
-    property int cellW: 22
-    property int cellH: Theme.barHeight - 10
+    property int cellW: 24
+    property int cellH: Theme.barHeight - 8
 
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(screen)
     readonly property int activeId: monitor?.activeWorkspace?.id ?? -1
@@ -24,7 +24,6 @@ Item {
         for (let i = 0; i < ws.length; i++) if (ws[i].id === id) return ws[i];
         return null;
     }
-    // Any workspace id beyond `count` that exists gets a cell too.
     readonly property var ids: {
         const ws = Hyprland.workspaces.values;
         let max = count;
@@ -51,21 +50,19 @@ Item {
                 }
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: Hyprland.dispatch("workspace " + parent.modelData)
+                    onClicked: Hyprland.dispatch("hl.dsp.focus({ workspace = " + parent.modelData + " })")
                 }
             }
         }
     }
 
-    // Sliding focus box
-    Bevel {
+    // Sliding bracket frame
+    CornerFrame {
         visible: root.activeId > 0
         x: root.ids.indexOf(root.activeId) * root.cellW
         y: 0
         width: root.cellW; height: root.cellH
-        cut: 3
-        fillColor: "transparent"
-        strokeColor: Theme.primary
+        arm: 5
         Behavior on x { NumberAnimation { duration: Theme.animFast; easing.type: Easing.OutCubic } }
     }
 }

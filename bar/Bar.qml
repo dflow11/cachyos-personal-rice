@@ -16,6 +16,11 @@ PanelWindow {
         return t.length > 40 ? t.substring(0, 39) + "…" : t;
     }
 
+    component Divider: Rectangle {
+        width: 1; height: Theme.barHeight - 12; color: Theme.border
+        anchors.verticalCenter: parent.verticalCenter
+    }
+
     Rectangle {
         id: surface
         anchors.fill: parent
@@ -26,12 +31,14 @@ PanelWindow {
         Row {
             id: left
             anchors { left: parent.left; leftMargin: Theme.gap; verticalCenter: parent.verticalCenter }
-            spacing: Theme.gap * 2
+            spacing: Theme.gap + 4
+            SystemLabel { anchors.verticalCenter: parent.verticalCenter }
+            Divider {}
             Workspaces { screen: bar.screen; anchors.verticalCenter: parent.verticalCenter }
-            Rectangle { width: 1; height: Theme.barHeight - 12; color: Theme.border; anchors.verticalCenter: parent.verticalCenter }
+            Divider {}
             ScrambleText {
                 anchors.verticalCenter: parent.verticalCenter
-                targetText: bar.monitorFocused ? bar.activeTitle : ""
+                targetText: bar.monitorFocused ? bar.activeTitle.toUpperCase() : ""
                 color: Theme.text
             }
         }
@@ -43,11 +50,11 @@ PanelWindow {
         Row {
             id: right
             anchors { right: parent.right; rightMargin: Theme.gap; verticalCenter: parent.verticalCenter }
-            spacing: Theme.gap * 2
+            spacing: Theme.gap + 4
             Telemetry { anchors.verticalCenter: parent.verticalCenter }
-            Rectangle { width: 1; height: Theme.barHeight - 12; color: Theme.border; anchors.verticalCenter: parent.verticalCenter }
+            Divider {}
             SysStats { anchors.verticalCenter: parent.verticalCenter }
-            Rectangle { width: 1; height: Theme.barHeight - 12; color: Theme.border; anchors.verticalCenter: parent.verticalCenter }
+            Divider {}
             Audio { anchors.verticalCenter: parent.verticalCenter }
         }
 

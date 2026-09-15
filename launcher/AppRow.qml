@@ -7,8 +7,13 @@ Item {
     required property string name
     required property string comment
     required property bool selected
+    property int gen: 0
+    property int stagger: 0
     signal activated()
     signal hovered()
+
+    onGenChanged: decodeDelay.restart()
+    Timer { id: decodeDelay; interval: 40 + root.stagger * 25; onTriggered: label.decode() }
 
     width: ListView.view ? ListView.view.width : 560
     height: 36
@@ -26,9 +31,10 @@ Item {
         anchors { left: parent.left; leftMargin: 14; verticalCenter: parent.verticalCenter }
         spacing: 12
         ScrambleText {
+            id: label
             anchors.verticalCenter: parent.verticalCenter
             targetText: root.name.toUpperCase()
-            duration: Theme.animFast * 2
+            decodeDuration: Theme.animFast * 2
             color: root.selected ? Theme.primary : Theme.text
         }
         MonoText {

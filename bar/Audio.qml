@@ -10,22 +10,23 @@ Item {
     readonly property bool muted: ready ? sink.audio.muted : true
     readonly property int vol: ready ? Math.round(sink.audio.volume * 100) : 0
 
-    implicitWidth: row.width
-    implicitHeight: row.height
+    implicitWidth: frame.implicitWidth
+    implicitHeight: frame.implicitHeight
 
     // Nodes only report volume/mute while explicitly tracked.
     PwObjectTracker { objects: root.sink ? [root.sink] : [] }
 
-    Row {
-        id: row
-        spacing: 6
-        MonoText { text: "VOL"; color: Theme.dim }
-        MonoText {
-            text: root.muted ? "---" : (root.vol < 10 ? " " : "") + root.vol
-            color: root.muted ? Theme.dim : (root.vol > 100 ? Theme.warn : Theme.text)
+    CornerFrame {
+        id: frame
+        Row {
+            spacing: 6
+            MonoText { text: "VOL"; color: Theme.dim }
+            MonoText {
+                text: root.muted ? "---" : String(root.vol).padStart(3, "0")
+                color: root.muted ? Theme.dim : (root.vol > 100 ? Theme.warn : Theme.text)
+            }
         }
     }
-
     MouseArea {
         anchors.fill: parent
         onClicked: if (root.ready) root.sink.audio.muted = !root.sink.audio.muted

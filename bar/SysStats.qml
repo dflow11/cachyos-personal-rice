@@ -3,27 +3,16 @@ import ".."
 import "../components"
 
 Row {
-    spacing: Theme.gap * 2
+    spacing: Theme.gap
     readonly property int cpuPct: Math.round(Sys.cpu * 100)
-    readonly property real memG: Sys.memUsed / 1073741824
+    readonly property real memFrac: Sys.memTotal > 0 ? Sys.memUsed / Sys.memTotal : 0
 
-    Row {
-        spacing: 6
+    Meter {
         anchors.verticalCenter: parent.verticalCenter
-        MonoText { text: "CPU"; color: Theme.dim }
-        MonoText {
-            text: (cpuPct < 10 ? " " : "") + cpuPct + "%"
-            color: cpuPct > 80 ? Theme.warn : Theme.text
-            Behavior on color { ColorAnimation { duration: Theme.animFast } }
-        }
+        label: "CPU"; value: cpuPct + "%"; fraction: Sys.cpu
     }
-    Row {
-        spacing: 6
+    Meter {
         anchors.verticalCenter: parent.verticalCenter
-        MonoText { text: "MEM"; color: Theme.dim }
-        MonoText {
-            text: memG.toFixed(1) + "G"
-            color: (Sys.memTotal > 0 && Sys.memUsed / Sys.memTotal > 0.8) ? Theme.warn : Theme.text
-        }
+        label: "MEM"; value: (Sys.memUsed / 1073741824).toFixed(1) + "G"; fraction: memFrac
     }
 }

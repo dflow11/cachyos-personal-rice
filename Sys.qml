@@ -13,6 +13,13 @@ Singleton {
     property int historyLen: 20
     property var cpuHistory: []     // most recent last, values 0..1
     property string hostname: "unknown"
+    // FNV-1a of hostname -> "XX-XXXX", the decorative node id
+    readonly property string nodeId: {
+        let h = 0x811c9dc5;
+        for (let i = 0; i < hostname.length; i++) { h ^= hostname.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+        const hex = h.toString(16).toUpperCase().padStart(8, "0");
+        return hex.substring(0, 2) + "-" + hex.substring(2, 6);
+    }
 
     property real _prevTotal: 0
     property real _prevIdle: 0

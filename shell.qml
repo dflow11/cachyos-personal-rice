@@ -2,6 +2,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "bar"
+import "boot"
+import "notify"
 import "launcher"
 
 Scope {
@@ -15,6 +17,8 @@ Scope {
         }
     }
 
+    Boot {}
+    Notifications {}
     Launcher { id: launcher }
 
     IpcHandler {

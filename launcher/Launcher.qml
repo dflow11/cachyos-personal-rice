@@ -18,6 +18,7 @@ PanelWindow {
 
     property string query: ""
     property int selected: 0
+    property int gen: 0                     // bumped on open; rows re-decode with stagger
     readonly property int maxVisible: 8
 
     // ---- data
@@ -43,7 +44,7 @@ PanelWindow {
     }
     function open() {
         root.screen = focusedScreen();
-        query = ""; input.text = ""; selected = 0;
+        query = ""; input.text = ""; selected = 0; gen++;
         visible = true;
         input.forceActiveFocus();
     }
@@ -67,7 +68,8 @@ PanelWindow {
     Rectangle {
         anchors.fill: parent
         color: Theme.bg
-        opacity: 0.85
+        opacity: root.visible ? 0.85 : 0
+        Behavior on opacity { NumberAnimation { duration: Theme.animFast * 2 } }
         MouseArea { anchors.fill: parent; onClicked: root.close() }
     }
 
@@ -79,15 +81,28 @@ PanelWindow {
         fillColor: Theme.panel
         strokeColor: Theme.primary
         cut: Theme.bevel * 2
+        // opens from a 1 px horizontal line
+        transform: Scale {
+            origin.x: panel.width / 2; origin.y: panel.height / 2
+            yScale: root.visible ? 1 : 0.002
+            Behavior on yScale { NumberAnimation { duration: Theme.animFast + 60; easing.type: Easing.OutCubic } }
+        }
 
         // header
         Item {
             id: header
             anchors { top: parent.top; left: parent.left; right: parent.right; margins: 1 }
             height: 56
+            TintedIcon {
+                id: emblem
+                anchors { left: parent.left; leftMargin: 18; verticalCenter: parent.verticalCenter }
+                source: Qt.resolvedUrl("../assets/os-icon.svg")
+                color: Theme.primary
+                width: 18; height: 18
+            }
             MonoText {
                 id: prompt
-                anchors { left: parent.left; leftMargin: 20; verticalCenter: parent.verticalCenter }
+                anchors { left: emblem.right; leftMargin: 12; verticalCenter: parent.verticalCenter }
                 text: ">"
                 color: Theme.primary
                 font.pixelSize: Theme.fontSize + 4
@@ -147,6 +162,7 @@ PanelWindow {
                 name: modelData.name
                 comment: modelData.comment
                 selected: index === root.selected
+                gen: root.gen; stagger: index
                 onHovered: root.selected = index
                 onActivated: { root.selected = index; root.launch(); }
             }
