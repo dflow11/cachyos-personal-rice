@@ -60,6 +60,7 @@ local menu = "hyprlauncher"
    hl.exec_cmd("qs -c nullgrid")
    hl.exec_cmd("hyprpaper")
    hl.exec_cmd("hypridle")
+   hl.exec_cmd("hyprctl setcursor capitaine-cursors-light 24")
    hl.exec_cmd("/usr/lib/polkit-kde-authentication-agent-1")
    hl.exec_cmd("wl-paste -- watch cliphist store")
  end)
@@ -72,6 +73,9 @@ local menu = "hyprlauncher"
 -- See https://wiki.hypr.land/Configuring/Advanced-and-Cool/Environment-variables/
 
 hl.env("XCURSOR_SIZE", "24")
+hl.env("XCURSOR_THEME", "capitaine-cursors-light")
+hl.env("QT_QPA_PLATFORMTHEME", "kde")
+hl.env("GTK_THEME", "Breeze-Dark")
 hl.env("HYPRCURSOR_SIZE", "24")
 hl.env("LIBVA_DRIVER_NAME", "nvidia")
 hl.env("NVD_BACKEND", "direct")
