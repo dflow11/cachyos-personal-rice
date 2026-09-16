@@ -1,0 +1,9 @@
+[Plymouth Theme]
+Name=nullgrid
+Description=ctOS boot splash: CT|OS block with a progress bar on black
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/nullgrid
+ScriptFile=/usr/share/plymouth/themes/nullgrid/nullgrid.script
+ConsoleLogBackgroundColor=0x0E0E0E

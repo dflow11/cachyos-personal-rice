@@ -1,0 +1,43 @@
+// nullgrid plymouth: black screen, grey CT block that fills as boot progresses, OS beside it.
+Window.SetBackgroundTopColor(0.055, 0.055, 0.055);
+Window.SetBackgroundBottomColor(0.055, 0.055, 0.055);
+
+W = Window.GetWidth(); H = Window.GetHeight();
+barW = Math.Int(W * 0.16); barH = Math.Int(H * 0.045);
+barX = Math.Int((W - barW * 1.37) / 2); barY = Math.Int((H - barH) / 2);
+
+grey = Image("grey.png"); dark = Image("dark.png"); green = Image("green.png");
+
+track = Sprite(dark.Scale(barW, barH)); track.SetPosition(barX, barY, 1);
+fill = Sprite(grey.Scale(1, barH));      fill.SetPosition(barX, barY, 2);
+
+ct = Sprite(Image.Text("CT", 0.055, 0.055, 0.055, 1, "DejaVu Sans Mono Bold " + Math.Int(barH * 0.5)));
+ct.SetPosition(barX + barW - ct.GetImage().GetWidth() - Math.Int(barH * 0.25), barY + Math.Int((barH - ct.GetImage().GetHeight()) / 2), 3);
+ct.SetOpacity(0);
+
+os = Sprite(Image.Text("OS", 0.85, 0.85, 0.85, 1, "DejaVu Sans Mono " + Math.Int(barH * 0.95)));
+os.SetPosition(barX + barW + Math.Int(barH * 0.3), barY + Math.Int((barH - os.GetImage().GetHeight()) / 2), 3);
+
+status = Sprite(); status.SetPosition(barX, barY + barH + Math.Int(barH * 0.6), 3);
+node = Sprite(Image.Text("» NODE ONLINE", 0.48, 0.48, 0.48, 1, "DejaVu Sans Mono " + Math.Int(barH * 0.3)));
+node.SetPosition(barX, barY - Math.Int(barH * 0.9), 3);
+
+fun progress_cb(duration, progress) {
+    w = Math.Int(barW * progress); if (w < 1) w = 1;
+    fill.SetImage(grey.Scale(w, barH));
+    if (progress > 0.35) ct.SetOpacity(1);
+}
+Plymouth.SetBootProgressFunction(progress_cb);
+
+// text prompts (LUKS passphrase, fsck messages) in the same voice
+fun display_normal_cb() { status.SetImage(Image.Text("", 0, 0, 0, 0, "")); }
+fun display_password_cb(prompt, bullets) {
+    s = "» " + prompt + " ";
+    for (i = 0; i < bullets; i++) s += "*";
+    status.SetImage(Image.Text(s, 0.8, 0.8, 0.8, 1, "DejaVu Sans Mono " + Math.Int(barH * 0.3)));
+}
+fun message_cb(text) { status.SetImage(Image.Text("» " + text, 0.48, 0.48, 0.48, 1, "DejaVu Sans Mono " + Math.Int(barH * 0.3))); }
+Plymouth.SetDisplayNormalFunction(display_normal_cb);
+Plymouth.SetDisplayPasswordFunction(display_password_cb);
+Plymouth.SetMessageFunction(message_cb);
+Plymouth.SetQuitFunction(fun() { fill.SetImage(grey.Scale(barW, barH)); ct.SetOpacity(1); });

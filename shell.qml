@@ -5,6 +5,7 @@ import "bar"
 import "boot"
 import "notify"
 import "osd"
+import "overview"
 import "launcher"
 
 Scope {
@@ -22,11 +23,17 @@ Scope {
     Notifications {}
     Osd {}
     Launcher { id: launcher }
+    Overview { id: overview }
 
     IpcHandler {
         target: "launcher"
         function toggle(): void { launcher.toggle(); }
         function open(): void { launcher.open(); }
         function close(): void { launcher.close(); }
+    }
+    IpcHandler {
+        target: "overview"
+        function toggle(): void { overview.toggle(); }
+        function close(): void { overview.close(); }
     }
 }

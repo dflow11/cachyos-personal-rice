@@ -261,6 +261,7 @@ hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("spotify-launcher"))
 hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("qs -c nullgrid ipc call launcher toggle"))
+hl.bind(mainMod .. " + TAB",   hl.dsp.exec_cmd("qs -c nullgrid ipc call overview toggle"))
 hl.bind(mainMod .. " + L",         hl.dsp.exec_cmd(os.getenv("HOME") .. "/.local/bin/ctos-lock"))
 hl.bind(mainMod .. " + SHIFT + L", hl.dsp.exec_cmd("hyprlock"), { locked = true })  -- recovery locker, works while locked
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
