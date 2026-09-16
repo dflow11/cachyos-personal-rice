@@ -61,6 +61,7 @@ local menu = "hyprlauncher"
 -- Or execute your favorite apps at launch like this:
 --
  hl.on("hyprland.start", function () 
+   hl.dispatch(hl.dsp.focus({ monitor = "DP-2" }))   -- DP-1 enumerates first; start on the main screen
    hl.exec_cmd("qs -c nullgrid")
    hl.exec_cmd("hyprpaper")
    hl.exec_cmd("hypridle")
