@@ -36,6 +36,10 @@ hl.monitor({
     scale    = 1,
 })
 
+-- DP-2 (left, 240 Hz) is main: it owns workspace 1, DP-1 owns workspace 2.
+hl.workspace_rule({ workspace = 1, monitor = "DP-2", default = true, persistent = true })
+hl.workspace_rule({ workspace = 2, monitor = "DP-1", default = true, persistent = true })
+
 
 ---------------------
 ---- MY PROGRAMS ----
