@@ -27,10 +27,19 @@ PanelWindow {
         all.sort((a, b) => a.name.localeCompare(b.name));
         return all;
     }
+    // session actions, only reachable by typing so a blind Enter never hits one
+    readonly property var power: [
+        { name: "Lock",     comment: "ctOS locker",        command: [Quickshell.env("HOME") + "/.local/bin/ctos-lock"] },
+        { name: "Logout",   comment: "exit Hyprland",      command: ["hyprctl", "dispatch", "hl.dsp.exit()"] },
+        { name: "Suspend",  comment: "systemctl suspend",  command: ["systemctl", "suspend"] },
+        { name: "Reboot",   comment: "systemctl reboot",   command: ["systemctl", "reboot"] },
+        { name: "Shutdown", comment: "systemctl poweroff", command: ["systemctl", "poweroff"] },
+    ]
     readonly property var results: {
         const q = query.trim().toLowerCase();
         if (q === "") return apps;
-        return apps.filter(e => e.name.toLowerCase().indexOf(q) !== -1);
+        const hit = e => e.name.toLowerCase().indexOf(q) !== -1;
+        return apps.filter(hit).concat(power.filter(hit));
     }
     onResultsChanged: selected = 0
 

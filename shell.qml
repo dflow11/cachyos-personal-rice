@@ -4,6 +4,7 @@ import Quickshell.Io
 import "bar"
 import "boot"
 import "notify"
+import "osd"
 import "launcher"
 
 Scope {
@@ -19,6 +20,7 @@ Scope {
 
     Boot {}
     Notifications {}
+    Osd {}
     Launcher { id: launcher }
 
     IpcHandler {
