@@ -1,0 +1,12 @@
+#!/bin/sh
+# nullgrid-shot [region|monitor]  ->  ~/Pictures/Screenshots/<stamp>.png + clipboard + toast
+set -e
+dir="$HOME/Pictures/Screenshots"; mkdir -p "$dir"
+out="$dir/$(date +%y%m%d-%H%M%S).png"
+case ${1:-region} in
+    region)  geom=$(slurp -b 0E0E0E80 -c 1BFD9CFF -w 1) || exit 0; grim -g "$geom" "$out" ;;
+    monitor) grim -o "$(hyprctl monitors -j | python3 -c 'import json,sys; print([m["name"] for m in json.load(sys.stdin) if m["focused"]][0])')" "$out" ;;
+    *) echo "usage: nullgrid-shot [region|monitor]" >&2; exit 2 ;;
+esac
+wl-copy < "$out"
+notify-send -a "ctOS" "Capture saved" "$(basename "$out") copied to clipboard"

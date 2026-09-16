@@ -1,0 +1,50 @@
+/* nullgrid — ctOS palette for the Firefox chrome. Mirrors quickshell/nullgrid/Theme.qml. */
+:root {
+  --ng-bg: #0E0E0E; --ng-panel: #121212; --ng-border: #2A2A2A;
+  --ng-text: #CCCCCC; --ng-dim: #7A7A7A; --ng-accent: #1BFD9C; --ng-mono: "JetBrainsMono Nerd Font", monospace;
+
+  --toolbar-bgcolor: var(--ng-panel) !important;
+  --toolbar-color: var(--ng-text) !important;
+  --lwt-accent-color: var(--ng-panel) !important;
+  --lwt-text-color: var(--ng-text) !important;
+  --chrome-content-separator-color: var(--ng-border) !important;
+  --toolbar-field-background-color: var(--ng-bg) !important;
+  --toolbar-field-color: var(--ng-text) !important;
+  --toolbar-field-focus-background-color: var(--ng-bg) !important;
+  --toolbar-field-focus-color: var(--ng-text) !important;
+  --toolbar-field-focus-border-color: var(--ng-accent) !important;
+  --toolbar-field-border-color: var(--ng-border) !important;
+  --urlbar-box-bgcolor: var(--ng-panel) !important;
+  --urlbar-box-hover-bgcolor: var(--ng-border) !important;
+  --tab-selected-bgcolor: var(--ng-bg) !important;
+  --tab-selected-textcolor: var(--ng-accent) !important;
+  --lwt-tab-text: var(--ng-dim) !important;
+  --arrowpanel-background: var(--ng-panel) !important;
+  --arrowpanel-border-color: var(--ng-border) !important;
+  --arrowpanel-color: var(--ng-text) !important;
+  --panel-separator-color: var(--ng-border) !important;
+  --focus-outline-color: var(--ng-accent) !important;
+  --button-primary-bgcolor: var(--ng-accent) !important;
+  --button-primary-color: var(--ng-bg) !important;
+  --tab-border-radius: 0 !important;
+  --toolbarbutton-border-radius: 0 !important;
+  --arrowpanel-border-radius: 0 !important;
+  --urlbar-min-height: 28px !important;
+}
+
+/* flat, square */
+#navigator-toolbox { border-bottom: 1px solid var(--ng-border) !important; }
+.tab-background, #urlbar-background, .urlbarView-row, menupopup, panel { border-radius: 0 !important; }
+#urlbar-background { border: 1px solid var(--ng-border) !important; }
+#urlbar[focused] #urlbar-background { border-color: var(--ng-accent) !important; }
+.tabbrowser-tab[selected] .tab-background { box-shadow: inset 0 -2px 0 var(--ng-accent) !important; }
+.tab-background:not([selected]) { background: transparent !important; }
+
+/* monospace, uppercase labels — reads like a ctOS readout */
+.tab-label, #urlbar, #searchbar, .urlbarView, #TabsToolbar, #nav-bar { font-family: var(--ng-mono) !important; }
+.tab-label { text-transform: uppercase; font-size: 11px !important; letter-spacing: 0.02em; }
+#urlbar-input, .urlbarView-row { font-size: 12px !important; }
+
+/* trim */
+#firefox-view-button, #alltabs-button, #tracking-protection-icon-container { display: none !important; }
+#TabsToolbar .titlebar-buttonbox-container { display: none !important; }   /* no server decorations on Hyprland */

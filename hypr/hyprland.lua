@@ -267,6 +267,8 @@ hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd("firefox"))
 hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("code"))
+hl.bind("Print",           hl.dsp.exec_cmd(os.getenv("HOME") .. "/.local/bin/nullgrid-shot region"))   -- pick a region
+hl.bind("SHIFT + Print",   hl.dsp.exec_cmd(os.getenv("HOME") .. "/.local/bin/nullgrid-shot monitor"))  -- focused monitor
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
