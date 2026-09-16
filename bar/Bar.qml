@@ -52,6 +52,7 @@ PanelWindow {
             anchors { right: parent.right; rightMargin: Theme.gap; verticalCenter: parent.verticalCenter }
             spacing: Theme.gap + 4
             Music { id: music; anchors.verticalCenter: parent.verticalCenter }
+            Cava { visible: music.visible; active: music.player?.isPlaying ?? false; anchors.verticalCenter: parent.verticalCenter }
             Divider { visible: music.visible }
             Telemetry { anchors.verticalCenter: parent.verticalCenter }
             Divider {}
