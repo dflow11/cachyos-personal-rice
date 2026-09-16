@@ -1,0 +1,10 @@
+#!/bin/sh
+# nullgrid-shader [crt|night] — toggles Hyprland's native screen shader. Same arg twice turns it off.
+# Lua configs reject `hyprctl keyword`, so this goes through `hyprctl eval`.
+set -e
+want="$HOME/.config/hypr/shaders/$1.frag"
+[ -f "$want" ] || { echo "usage: nullgrid-shader [crt|night]" >&2; exit 2; }
+[ "$(hyprctl getoption decoration:screen_shader -j | jq -r .str)" = "$want" ] && want=""
+hyprctl eval "hl.config({ decoration = { screen_shader = \"$want\" } })" >/dev/null
+[ -n "$want" ] && msg="$1 on" || msg="off"
+notify-send -a "ctOS" "Screen shader" "$msg"

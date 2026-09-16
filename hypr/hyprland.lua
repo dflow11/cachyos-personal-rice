@@ -67,7 +67,7 @@ local menu = "hyprlauncher"
    hl.exec_cmd("hypridle")
    hl.exec_cmd("hyprctl setcursor capitaine-cursors-light 24")
    hl.exec_cmd("/usr/lib/polkit-kde-authentication-agent-1")
-   hl.exec_cmd("wl-paste -- watch cliphist store")
+   hl.exec_cmd("wl-paste --watch cliphist store")
  end)
 
 
@@ -269,6 +269,9 @@ hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd("firefox"))
 hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("code"))
+hl.bind(mainMod .. " + SHIFT + X", hl.dsp.exec_cmd(os.getenv("HOME") .. "/.local/bin/nullgrid-shader crt"))    -- CRT scanlines
+hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd(os.getenv("HOME") .. "/.local/bin/nullgrid-shader night"))  -- warm night filter
+hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd(os.getenv("HOME") .. "/.local/bin/nullgrid-pick"))          -- pixel color to clipboard
 hl.bind("Print",           hl.dsp.exec_cmd(os.getenv("HOME") .. "/.local/bin/nullgrid-shot region"))   -- pick a region
 hl.bind("SHIFT + Print",   hl.dsp.exec_cmd(os.getenv("HOME") .. "/.local/bin/nullgrid-shot monitor"))  -- focused monitor
 

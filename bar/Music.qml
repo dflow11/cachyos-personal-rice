@@ -13,7 +13,7 @@ Item {
         if (!player) return "";
         const t = player.trackTitle || "UNTITLED";
         const s = (player.trackArtist ? player.trackArtist + " — " : "") + t;
-        return (s.length > 38 ? s.substring(0, 37) + "…" : s).toUpperCase();
+        return (s.length > 24 ? s.substring(0, 23) + "…" : s).toUpperCase();
     }
     readonly property real frac: player && player.lengthSupported && player.length > 0 ? Math.min(1, player.position / player.length) : 0
 

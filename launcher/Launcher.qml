@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import ".."
@@ -35,9 +36,27 @@ PanelWindow {
         { name: "Reboot",   comment: "systemctl reboot",   command: ["systemctl", "reboot"] },
         { name: "Shutdown", comment: "systemctl poweroff", command: ["systemctl", "poweroff"] },
     ]
+    // clipboard history, refreshed on open; reachable by typing "clip"
+    property var clips: []
+    Process {
+        id: cliphist
+        command: ["cliphist", "list"]
+        stdout: StdioCollector {
+            onStreamFinished: root.clips = text.split("\n").filter(l => l !== "").slice(0, 50).map(l => {
+                const i = l.indexOf("\t");
+                return { name: l.substring(i + 1), comment: "clipboard",
+                         command: ["sh", "-c", "cliphist decode " + l.substring(0, i) + " | wl-copy"] };
+            })
+        }
+    }
+
     readonly property var results: {
         const q = query.trim().toLowerCase();
         if (q === "") return apps;
+        if (q.startsWith("clip")) {
+            const r = q.substring(4).trim();
+            return clips.filter(c => r === "" || c.name.toLowerCase().indexOf(r) !== -1);
+        }
         const hit = e => e.name.toLowerCase().indexOf(q) !== -1;
         return apps.filter(hit).concat(power.filter(hit));
     }
@@ -54,6 +73,7 @@ PanelWindow {
     function open() {
         root.screen = focusedScreen();
         query = ""; input.text = ""; selected = 0; gen++;
+        cliphist.running = true;
         visible = true;
         input.forceActiveFocus();
     }

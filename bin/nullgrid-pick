@@ -1,0 +1,6 @@
+#!/bin/sh
+# nullgrid-pick — click a pixel, get #RRGGBB on the clipboard. grim + slurp + PIL, no hyprpicker needed.
+geom=$(slurp -p) || exit 0
+hex=$(grim -g "$geom" -t ppm - | python3 -c "import sys; d=sys.stdin.buffer.read(); print('#%02X%02X%02X' % tuple(d[-3:]))")
+printf %s "$hex" | wl-copy
+notify-send -a "ctOS" "Color picked" "$hex copied"
