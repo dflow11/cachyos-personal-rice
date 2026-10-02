@@ -16,7 +16,11 @@ set -- --protocol=anyconnect \
        vpn.uic.edu
 
 if [ -n "$PASSCMD" ]; then
-    eval "$PASSCMD" | sudo openconnect --passwd-on-stdin "$@"
-else
-    sudo openconnect "$@"
+    pw=$(eval "$PASSCMD" 2>/dev/null || true)
+    if [ -n "$pw" ]; then
+        printf '%s\n' "$pw" | sudo openconnect --passwd-on-stdin "$@"
+        exit $?
+    fi
+    echo "keyring lookup returned nothing — falling back to a prompt" >&2
 fi
+sudo openconnect "$@"
