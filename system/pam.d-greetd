@@ -1,0 +1,16 @@
+#%PAM-1.0
+# nullgrid: stock Arch greetd stack plus the two pam_gnome_keyring lines, so the login
+# keyring unlocks with your login password at sign-in.
+# Install:  sudo cp -b /home/diego/.config/quickshell/nullgrid/system/pam.d-greetd /etc/pam.d/greetd
+# Rollback: sudo mv /etc/pam.d/greetd~ /etc/pam.d/greetd
+# Only graphical login reads this file; TTY login uses /etc/pam.d/login and stays untouched.
+
+auth       required     pam_securetty.so
+auth       requisite    pam_nologin.so
+auth       include      system-local-login
+auth       optional     pam_gnome_keyring.so
+
+account    include      system-local-login
+
+session    include      system-local-login
+session    optional     pam_gnome_keyring.so auto_start
