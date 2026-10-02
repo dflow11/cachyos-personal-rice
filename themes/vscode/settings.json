@@ -3,7 +3,7 @@
   "editor.fontSize": 13,
   "editor.fontLigatures": false,
   "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'",
-  "workbench.colorTheme": "Default Dark Modern",
+  "workbench.colorTheme": "Dark Modern",
   "workbench.iconTheme": null,
   "window.titleBarStyle": "custom",
   "window.menuBarVisibility": "toggle",
