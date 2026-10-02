@@ -68,7 +68,6 @@ local menu = "hyprlauncher"
    hl.exec_cmd("hyprctl setcursor capitaine-cursors-light 24")
    hl.exec_cmd("/usr/lib/polkit-kde-authentication-agent-1")
    hl.exec_cmd("wl-paste --watch cliphist store")
-   hl.exec_cmd("gnome-keyring-daemon --start --components=secrets")   -- Secret Service for the VPN password
  end)
 
 

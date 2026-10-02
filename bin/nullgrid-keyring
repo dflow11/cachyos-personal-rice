@@ -1,0 +1,21 @@
+#!/bin/sh
+# Unlock (or create) the login keyring for this session, then make it the Secret Service.
+# gnome-keyring has no PAM hook under greetd here, so this is needed once per login before
+# the VPN password can be read back. ponytail: per-session unlock; add pam_gnome_keyring
+# to /etc/pam.d/greetd if you want it unlocked automatically at login.
+if [ -t 0 ]; then
+    printf 'Keyring password: ' >&2
+    stty -echo 2>/dev/null
+    read -r pw
+    stty echo 2>/dev/null
+    printf '\n' >&2
+else
+    read -r pw
+fi
+printf '%s\n' "$pw" | gnome-keyring-daemon --replace --unlock --components=secrets >/dev/null 2>&1 &
+sleep 2
+if timeout 5 busctl --user list 2>/dev/null | grep -q org.freedesktop.secrets; then
+    echo "keyring unlocked" >&2
+else
+    echo "keyring did not come up" >&2; exit 1
+fi
