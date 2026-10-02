@@ -22,5 +22,7 @@ if [ -n "$PASSCMD" ]; then
         exit $?
     fi
     echo "keyring lookup returned nothing — falling back to a prompt" >&2
+else
+    echo "no PASSCMD in $conf — password will be prompted" >&2
 fi
 sudo openconnect "$@"
