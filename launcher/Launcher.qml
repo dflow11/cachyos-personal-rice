@@ -31,10 +31,7 @@ PanelWindow {
     // session actions, only reachable by typing so a blind Enter never hits one
     readonly property var power: [
         { name: "VPN",      comment: "UIC AnyConnect (openconnect)",
-          // UIC serves an incomplete chain, so the gateway cert is pinned instead of CA-verified.
-          // Cert expires 2027-04-11; refresh the pin then with: openconnect --protocol=anyconnect vpn.uic.edu
-          command: ["ghostty", "-e", "sudo", "openconnect", "--protocol=anyconnect",
-                    "--servercert", "pin-sha256:iD3a1iBqPkRU1SznA/kzdDri4ypZXnOMA/fknADDab4=", "vpn.uic.edu"] },
+          command: ["ghostty", "-e", Quickshell.env("HOME") + "/.local/bin/nullgrid-vpn"] },
         { name: "Lock",     comment: "ctOS locker",        command: [Quickshell.env("HOME") + "/.local/bin/ctos-lock"] },
         { name: "Logout",   comment: "exit Hyprland",      command: ["hyprctl", "dispatch", "hl.dsp.exit()"] },
         { name: "Suspend",  comment: "systemctl suspend",  command: ["systemctl", "suspend"] },

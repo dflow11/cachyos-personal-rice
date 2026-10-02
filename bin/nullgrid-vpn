@@ -1,0 +1,22 @@
+#!/bin/sh
+# UIC VPN. Settings live in ~/.config/nullgrid-vpn.conf, which is deliberately NOT in the repo
+# (it holds your NetID). Duo: DUO=push approves on your phone; "sms" or a 6-digit code also work.
+# ponytail: password is typed, not stored. Set PASSCMD to a keyring lookup if you add one.
+set -e
+conf="$HOME/.config/nullgrid-vpn.conf"
+[ -f "$conf" ] || { echo "missing $conf — set NETID=yournetid" >&2; exit 1; }
+. "$conf"
+[ -n "$NETID" ] || { echo "set NETID= in $conf" >&2; exit 1; }
+
+set -- --protocol=anyconnect \
+       --servercert pin-sha256:iD3a1iBqPkRU1SznA/kzdDri4ypZXnOMA/fknADDab4= \
+       --authgroup="${GROUP:-General-Use}" \
+       --user="$NETID" \
+       --form-entry "main:secondary_password=${DUO:-push}" \
+       vpn.uic.edu
+
+if [ -n "$PASSCMD" ]; then
+    eval "$PASSCMD" | sudo openconnect --passwd-on-stdin "$@"
+else
+    sudo openconnect "$@"
+fi
