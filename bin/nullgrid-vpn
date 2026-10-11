@@ -1,13 +1,32 @@
 #!/bin/sh
-# UIC VPN. Settings live in ~/.config/nullgrid-vpn.conf, which is deliberately NOT in the repo
-# (it holds your NetID). Duo: DUO=push approves on your phone; "sms" or a 6-digit code also work.
-# ponytail: password is typed, not stored. Set PASSCMD to a keyring lookup if you add one.
+# UIC VPN. Settings live in ~/.config/nullgrid-vpn.conf (NETID, optional GROUP/DUO/PASSCMD),
+# which is deliberately NOT in the repo since it holds your NetID.
+# If the root helper is installed (see system/), sudo needs no password for that one fixed
+# command. Otherwise this falls back to a normal sudo prompt.
 set -e
 conf="$HOME/.config/nullgrid-vpn.conf"
 [ -f "$conf" ] || { echo "missing $conf — set NETID=yournetid" >&2; exit 1; }
 . "$conf"
 [ -n "$NETID" ] || { echo "set NETID= in $conf" >&2; exit 1; }
 
+pw=''
+if [ -n "$PASSCMD" ]; then
+    pw=$(eval "$PASSCMD" 2>/dev/null || true)
+    [ -n "$pw" ] || echo "keyring lookup returned nothing — password will be prompted" >&2
+else
+    echo "no PASSCMD in $conf — password will be prompted" >&2
+fi
+
+# Fast path: fixed-argument root helper, passwordless via /etc/sudoers.d/nullgrid-vpn.
+helper=/usr/local/bin/nullgrid-vpn-root
+if [ -x "$helper" ] && [ -n "$pw" ]; then
+    if printf '%s\n' "$pw" | sudo -n "$helper" "$NETID"; then
+        exit 0
+    fi
+    echo "passwordless helper did not run — falling back to a sudo prompt" >&2
+fi
+
+# Fallback: ordinary sudo. GROUP and DUO only apply here; the helper fixes them.
 set -- --protocol=anyconnect \
        --servercert pin-sha256:iD3a1iBqPkRU1SznA/kzdDri4ypZXnOMA/fknADDab4= \
        --authgroup="${GROUP:-General-Use}" \
@@ -15,14 +34,8 @@ set -- --protocol=anyconnect \
        --form-entry "main:secondary_password=${DUO:-push}" \
        vpn.uic.edu
 
-if [ -n "$PASSCMD" ]; then
-    pw=$(eval "$PASSCMD" 2>/dev/null || true)
-    if [ -n "$pw" ]; then
-        printf '%s\n' "$pw" | sudo openconnect --passwd-on-stdin "$@"
-        exit $?
-    fi
-    echo "keyring lookup returned nothing — falling back to a prompt" >&2
+if [ -n "$pw" ]; then
+    printf '%s\n' "$pw" | sudo openconnect --passwd-on-stdin "$@"
 else
-    echo "no PASSCMD in $conf — password will be prompted" >&2
+    sudo openconnect "$@"
 fi
-sudo openconnect "$@"

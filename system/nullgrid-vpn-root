@@ -1,0 +1,17 @@
+#!/bin/sh
+# Root half of the UIC VPN connect. Every option is fixed here, so the matching
+# sudoers rule cannot be bent into running anything else (notably openconnect's
+# --script, which would otherwise be a root shell). Password arrives on stdin.
+# Install: sudo install -m 755 -o root -g root this_file /usr/local/bin/nullgrid-vpn-root
+set -e
+netid=$1
+case "$netid" in
+    ''|-*) echo "usage: nullgrid-vpn-root <netid>" >&2; exit 2 ;;
+esac
+exec openconnect --passwd-on-stdin \
+    --protocol=anyconnect \
+    --servercert pin-sha256:iD3a1iBqPkRU1SznA/kzdDri4ypZXnOMA/fknADDab4= \
+    --authgroup=General-Use \
+    --user="$netid" \
+    --form-entry main:secondary_password=push \
+    vpn.uic.edu

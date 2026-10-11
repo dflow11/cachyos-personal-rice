@@ -1,0 +1,1 @@
+diego ALL=(root) NOPASSWD: /usr/local/bin/nullgrid-vpn-root
