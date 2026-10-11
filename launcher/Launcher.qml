@@ -32,6 +32,8 @@ PanelWindow {
     readonly property var power: [
         { name: "VPN",      comment: "UIC AnyConnect (openconnect)",
           command: ["ghostty", "-e", Quickshell.env("HOME") + "/.local/bin/nullgrid-vpn"] },
+        { name: "Awake",    comment: "toggle stay-awake (blocks idle + suspend)",
+          command: [Quickshell.env("HOME") + "/.local/bin/nullgrid-awake"] },
         { name: "Lock",     comment: "ctOS locker",        command: [Quickshell.env("HOME") + "/.local/bin/ctos-lock"] },
         { name: "Logout",   comment: "exit Hyprland",      command: ["hyprctl", "dispatch", "hl.dsp.exit()"] },
         { name: "Suspend",  comment: "systemctl suspend",  command: ["systemctl", "suspend"] },

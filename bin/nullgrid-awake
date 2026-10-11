@@ -1,0 +1,25 @@
+#!/bin/sh
+# nullgrid-awake [minutes] — Amphetamine for Hyprland. Blocks idle and suspend until
+# run again, or for N minutes. hypridle has ignore_dbus_inhibit = false, so one
+# systemd-inhibit holding a sleep is the entire feature.
+set -e
+pidfile="${XDG_RUNTIME_DIR:-/tmp}/nullgrid-awake.pid"
+
+# ponytail: pidfile, not `pkill -f nullgrid-awake` — that matches this script too.
+if [ -s "$pidfile" ] && kill -0 "$(cat "$pidfile")" 2>/dev/null; then
+    kill -- -"$(cat "$pidfile")"   # whole group, so the sleep child goes too
+    rm -f "$pidfile"
+    notify-send -a "ctOS" "Stay awake" "off"
+    exit 0
+fi
+
+case "$1" in
+    '')           secs=infinity ;;
+    0|*[!0-9]*)   echo "usage: nullgrid-awake [minutes]" >&2; exit 2 ;;
+    *)            secs=$(( $1 * 60 )) ;;
+esac
+
+setsid systemd-inhibit --what=idle:sleep --who=nullgrid --why="stay awake" sleep "$secs" &
+echo $! > "$pidfile"
+[ "$secs" = infinity ] && msg="on until toggled off" || msg="on for $1 min"
+notify-send -a "ctOS" "Stay awake" "$msg"
