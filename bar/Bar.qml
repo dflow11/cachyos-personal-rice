@@ -51,6 +51,8 @@ PanelWindow {
             id: right
             anchors { right: parent.right; rightMargin: Theme.gap; verticalCenter: parent.verticalCenter }
             spacing: Theme.gap + 4
+            Awake { anchors.verticalCenter: parent.verticalCenter }
+
             Tray { id: tray; anchors.verticalCenter: parent.verticalCenter }
             Divider { visible: tray.visible }
             Weather { id: wx; anchors.verticalCenter: parent.verticalCenter }

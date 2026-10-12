@@ -1,41 +1,40 @@
 #!/bin/sh
-# UIC VPN. Settings live in ~/.config/nullgrid-vpn.conf (NETID, optional GROUP/DUO/PASSCMD),
-# which is deliberately NOT in the repo since it holds your NetID.
-# If the root helper is installed (see system/), sudo needs no password for that one fixed
-# command. Otherwise this falls back to a normal sudo prompt.
+# UIC VPN. Settings live in ~/.config/nullgrid-vpn.conf (NETID, optional PASSCMD), which is
+# deliberately NOT in the repo since it holds your NetID.
+#
+# Every openconnect option — gateway, auth group, Duo mode, pinned cert — lives in the root
+# helper and nowhere else, so there is one copy to update and the NOPASSWD sudoers rule
+# cannot be bent into running anything but that fixed command.
+# The pinned cert expires 2027-04-11; openconnect refuses loudly when it rotates.
 set -e
 conf="$HOME/.config/nullgrid-vpn.conf"
+helper=/usr/local/bin/nullgrid-vpn-root
+
 [ -f "$conf" ] || { echo "missing $conf — set NETID=yournetid" >&2; exit 1; }
 . "$conf"
 [ -n "$NETID" ] || { echo "set NETID= in $conf" >&2; exit 1; }
+[ -x "$helper" ] || { echo "$helper not installed — see system/ in the nullgrid repo" >&2; exit 1; }
 
 pw=''
 if [ -n "$PASSCMD" ]; then
     pw=$(eval "$PASSCMD" 2>/dev/null || true)
-    [ -n "$pw" ] || echo "keyring lookup returned nothing — password will be prompted" >&2
+    [ -n "$pw" ] || echo "keyring lookup returned nothing" >&2
 else
-    echo "no PASSCMD in $conf — password will be prompted" >&2
+    echo "no PASSCMD in $conf" >&2
 fi
 
-# Fast path: fixed-argument root helper, passwordless via /etc/sudoers.d/nullgrid-vpn.
-helper=/usr/local/bin/nullgrid-vpn-root
-if [ -x "$helper" ] && [ -n "$pw" ]; then
-    if printf '%s\n' "$pw" | sudo -n "$helper" "$NETID"; then
-        exit 0
-    fi
-    echo "passwordless helper did not run — falling back to a sudo prompt" >&2
+# The helper fixes --passwd-on-stdin, so the password always arrives on stdin; ask for it
+# here with echo off rather than letting openconnect read a visible line off the terminal.
+if [ -z "$pw" ]; then
+    printf 'UIC password: ' >&2
+    stty -echo 2>/dev/null
+    read -r pw
+    stty echo 2>/dev/null
+    printf '\n' >&2
 fi
 
-# Fallback: ordinary sudo. GROUP and DUO only apply here; the helper fixes them.
-set -- --protocol=anyconnect \
-       --servercert pin-sha256:iD3a1iBqPkRU1SznA/kzdDri4ypZXnOMA/fknADDab4= \
-       --authgroup="${GROUP:-General-Use}" \
-       --user="$NETID" \
-       --form-entry "main:secondary_password=${DUO:-push}" \
-       vpn.uic.edu
-
-if [ -n "$pw" ]; then
-    printf '%s\n' "$pw" | sudo openconnect --passwd-on-stdin "$@"
-else
-    sudo openconnect "$@"
-fi
+# -n first: the sudoers rule makes this one command passwordless. sudo prompts on the tty,
+# not stdin, so the piped password does not interfere with the fallback.
+printf '%s\n' "$pw" | sudo -n "$helper" "$NETID" && exit 0
+echo "passwordless sudo rule not active — falling back to a sudo prompt" >&2
+printf '%s\n' "$pw" | sudo "$helper" "$NETID"

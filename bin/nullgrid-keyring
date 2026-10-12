@@ -1,8 +1,12 @@
 #!/bin/sh
-# Unlock (or create) the login keyring for this session, then make it the Secret Service.
-# gnome-keyring has no PAM hook under greetd here, so this is needed once per login before
-# the VPN password can be read back. ponytail: per-session unlock; add pam_gnome_keyring
-# to /etc/pam.d/greetd if you want it unlocked automatically at login.
+# Unlock the login keyring for this session and make it the Secret Service.
+# pam_gnome_keyring in /etc/pam.d/greetd normally does this at login; this is the manual
+# fallback for when it does not (wrong keyring name, or a session started outside greetd).
+owner() {
+    timeout 5 busctl --user call org.freedesktop.DBus /org/freedesktop/DBus \
+        org.freedesktop.DBus GetConnectionUnixProcessID s org.freedesktop.secrets 2>/dev/null
+}
+
 if [ -t 0 ]; then
     printf 'Keyring password: ' >&2
     stty -echo 2>/dev/null
@@ -12,10 +16,29 @@ if [ -t 0 ]; then
 else
     read -r pw
 fi
+
+before=$(owner)
 printf '%s\n' "$pw" | gnome-keyring-daemon --replace --unlock --components=secrets >/dev/null 2>&1 &
-sleep 2
-if timeout 5 busctl --user list 2>/dev/null | grep -q org.freedesktop.secrets; then
-    echo "keyring unlocked" >&2
-else
-    echo "keyring did not come up" >&2; exit 1
-fi
+
+# Two traps here. --replace hands the bus over asynchronously, so until the owning PID
+# changes we are still querying the OLD daemon — which answers "unlocked" no matter what
+# password was just typed. And a wrong password still starts a daemon and still exports
+# org.freedesktop.secrets; only the collection stays locked. So: wait for the handover,
+# then check the collection's Locked property rather than the presence of the bus name.
+i=0
+while [ "$i" -lt 40 ]; do
+    now=$(owner)
+    [ -n "$now" ] && [ "$now" != "$before" ] && break
+    i=$((i + 1))
+    sleep 0.25
+done
+
+state=$(timeout 5 busctl --user get-property org.freedesktop.secrets \
+    /org/freedesktop/secrets/aliases/default \
+    org.freedesktop.Secret.Collection Locked 2>/dev/null)
+
+case "$state" in
+    "b false") echo "keyring unlocked" >&2 ;;
+    "b true")  echo "keyring is still locked — wrong password" >&2; exit 1 ;;
+    *)         echo "keyring did not come up" >&2; exit 1 ;;
+esac

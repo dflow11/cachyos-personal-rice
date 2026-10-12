@@ -13,6 +13,7 @@ Singleton {
     property int historyLen: 20
     property var cpuHistory: []     // most recent last, values 0..1
     property string hostname: "unknown"
+    property bool awake: false      // bin/nullgrid-awake is holding an idle inhibitor
     // FNV-1a of hostname -> "XX-XXXX", the decorative node id
     readonly property string nodeId: {
         let h = 0x811c9dc5;
@@ -60,6 +61,15 @@ Singleton {
             root.memUsed = root.memTotal - g("MemAvailable");
         }
     }
+    // Existence check, not a read: nullgrid-awake removes this file the moment the
+    // inhibitor goes away, including when a timed session expires by itself.
+    FileView {
+        id: awakeFile
+        path: (Quickshell.env("XDG_RUNTIME_DIR") || "/tmp") + "/nullgrid-awake.pid"
+        printErrors: false
+        onLoaded: root.awake = true
+        onLoadFailed: root.awake = false
+    }
     FileView {
         id: uptimeFile
         path: "/proc/uptime"
@@ -68,7 +78,7 @@ Singleton {
 
     Timer {
         interval: 2000; running: true; repeat: true; triggeredOnStart: true
-        onTriggered: { statFile.reload(); memFile.reload(); uptimeFile.reload(); }
+        onTriggered: { statFile.reload(); memFile.reload(); uptimeFile.reload(); awakeFile.reload(); }
     }
 
     function fmtUptime(s) {

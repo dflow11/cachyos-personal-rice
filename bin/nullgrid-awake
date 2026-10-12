@@ -19,7 +19,11 @@ case "$1" in
     *)            secs=$(( $1 * 60 )) ;;
 esac
 
-setsid systemd-inhibit --what=idle:sleep --who=nullgrid --why="stay awake" sleep "$secs" &
+# The whole thing is one setsid group so `kill -- -pid` takes the sleep down with it, and
+# the shell removes the pidfile when a timed session ends on its own — the bar reads
+# "awake" as nothing more than "does this file exist", so it must never go stale.
+setsid sh -c 'systemd-inhibit --what=idle:sleep --who=nullgrid --why="stay awake" \
+    sleep "$1"; rm -f "$2"' _ "$secs" "$pidfile" &
 echo $! > "$pidfile"
 [ "$secs" = infinity ] && msg="on until toggled off" || msg="on for $1 min"
 notify-send -a "ctOS" "Stay awake" "$msg"
