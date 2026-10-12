@@ -16,7 +16,7 @@ Item {
         Row {
             spacing: Theme.gap
             MonoText {
-                text: Qt.formatDateTime(clock.date, "dd-MM-yy")
+                text: Qt.formatDateTime(clock.date, "MM-dd-yy")
                 color: Theme.dim
                 anchors.verticalCenter: parent.verticalCenter
             }
