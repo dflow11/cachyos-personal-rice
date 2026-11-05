@@ -365,6 +365,15 @@ hl.layer_rule({
     no_anim = true,
 })
 
+-- The webcam viewer floats; plain mpv windows still tile, so match the title it sets.
+hl.window_rule({
+    name  = "float-nullgrid-cam",
+    match = { title = "^nullgrid-cam$" },
+
+    float = true,
+    size  = "1280 720",   -- mpv has not reported the video size yet when this fires
+})
+
 -- Hyprland-run windowrule
 hl.window_rule({
     name  = "move-hyprland-run",
