@@ -1,13 +1,21 @@
 #!/bin/sh
-# nullgrid-cam [device] — webcam viewer. mpv already is a camera app: `s` takes the photo,
-# `f` fullscreens, `q` quits. This only points it at the capture node, picks a format the
-# camera actually offers and decides where photos land.
+# nullgrid-cam [device] — camera. Runs kamoso when it is there, otherwise (or if kamoso
+# fails) falls back to mpv, which already is a camera app: `s` takes the photo, `f`
+# fullscreens, `q` quits. Passing a device explicitly always uses the mpv path.
 #
 # The EMEET exposes two nodes; /dev/video1 is metadata-only, so video0 is the capture one.
 # mpv prints a handful of VIDIOC_QBUF "Inappropriate ioctl" lines when it closes the
 # device. They are shutdown noise, not a failure — the stream decodes normally.
 set -e
 dev=${1:-/dev/video0}
+
+# Kamoso is the real camera app and picks up the KDE colour scheme; this script keeps the
+# mpv viewer as the fallback. Quitting kamoso normally exits 0 and stops here, so the
+# fallback only fires when it is missing or actually fails.
+if [ -z "$1" ] && command -v kamoso >/dev/null; then
+    kamoso && exit 0
+    echo "kamoso exited with an error — falling back to the mpv viewer" >&2
+fi
 dir="$HOME/Pictures/Camera"
 mkdir -p "$dir"
 

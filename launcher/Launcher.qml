@@ -32,7 +32,7 @@ PanelWindow {
     readonly property var power: [
         { name: "VPN",      comment: "UIC AnyConnect (openconnect)",
           command: ["ghostty", "-e", Quickshell.env("HOME") + "/.local/bin/nullgrid-vpn"] },
-        { name: "Camera",   comment: "webcam viewer — s photo, f fullscreen, q quit",
+        { name: "Camera",   comment: "kamoso, falling back to the mpv viewer",
           command: [Quickshell.env("HOME") + "/.local/bin/nullgrid-cam"] },
         { name: "Awake",    comment: "toggle stay-awake (blocks idle + suspend)",
           command: [Quickshell.env("HOME") + "/.local/bin/nullgrid-awake"] },
