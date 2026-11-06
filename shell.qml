@@ -20,7 +20,7 @@ Scope {
     }
 
     Boot {}
-    Notifications {}
+    Notifications { id: notifications }
     Osd {}
     Launcher { id: launcher }
     Overview { id: overview }
@@ -30,6 +30,12 @@ Scope {
         function toggle(): void { launcher.toggle(); }
         function open(): void { launcher.open(); }
         function close(): void { launcher.close(); }
+    }
+    IpcHandler {
+        target: "notifs"
+        function toggle(): void { notifications.toggleLog(); }
+        function close(): void { notifications.closeLog(); }
+        function clear(): void { notifications.clearLog(); }
     }
     IpcHandler {
         target: "overview"
