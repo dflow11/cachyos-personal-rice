@@ -1,21 +1,35 @@
 #!/bin/sh
-# nullgrid-cam [device] — webcam viewer. mpv already is a camera app: `s` takes the photo,
-# `f` fullscreens, `q` quits.
+# nullgrid-cam [mpv|device] — camera.
+#   nullgrid-cam              guvcview: preview, photos, video recording, full v4l2 controls
+#   nullgrid-cam mpv          the mpv fallback viewer — `s` photo, `f` fullscreen, `q` quit
+#   nullgrid-cam /dev/videoN  the mpv viewer on a specific device
+#
+# Deliberately no automatic fallback on exit status, because exit status says nothing here:
+# kamoso exited 0 with a permanently black preview, and guvcview has been seen to exit 139
+# after a capture. Chaining on it would either never fall back or fall back constantly.
 #
 # Kamoso was tried and dropped: on the NVIDIA proprietary driver under Wayland its
-# GStreamer GL sink cannot import the camera's DMA-BUF frames, so the window opens with a
-# permanently black preview ("GL_INVALID_OPERATION ... <image> and <target> are
-# incompatible"). It exits 0 on quit, so chaining it ahead of this never fell back.
-# Retry it after a driver bump; guvcview is the GTK alternative that skips the GL path.
+# GStreamer GL sink cannot import the camera's DMA-BUF frames, so the preview stays black
+# ("GL_INVALID_OPERATION ... <image> and <target> are incompatible"). Worth retrying after
+# a driver bump. guvcview is GTK3 and renders its own frames, so it sidesteps that path.
 #
 # The EMEET exposes two nodes; /dev/video1 is metadata-only, so video0 is the capture one.
-# mpv prints a handful of VIDIOC_QBUF "Inappropriate ioctl" lines when it closes the
-# device. They are shutdown noise, not a failure — the stream decodes normally.
 set -e
-dev=${1:-/dev/video0}
 dir="$HOME/Pictures/Camera"
 mkdir -p "$dir"
 
+# guvcview appends -1, -2, ... so photos do not overwrite each other.
+if [ -z "$1" ] && command -v guvcview >/dev/null; then
+    exec guvcview -d /dev/video0 -x 1920x1080 -f MJPG -i "$dir/cam.jpg"
+fi
+
+dev=$1
+[ "$dev" = mpv ] && dev=""
+dev=${dev:-/dev/video0}
+
+# mpv prints a few VIDIOC_QBUF "Inappropriate ioctl" lines when it closes the device.
+# They are shutdown noise, not a failure — the stream decodes normally.
+#
 # hflip so the preview reads as a mirror, the way every other webcam app shows you.
 # Photos save flipped to match what you framed; drop --vf=hflip for true orientation.
 exec mpv "av://v4l2:$dev" \
