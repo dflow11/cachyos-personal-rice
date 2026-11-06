@@ -106,7 +106,7 @@ Scope {
                     // auto-expire; critical stays until clicked
                     Timer {
                         running: !toast.critical
-                        interval: toast.modelData.expireTimeout > 0 ? toast.modelData.expireTimeout : 3000
+                        interval: toast.modelData.expireTimeout > 0 ? toast.modelData.expireTimeout : 5000
                         onTriggered: toast.modelData.expire()
                     }
 
